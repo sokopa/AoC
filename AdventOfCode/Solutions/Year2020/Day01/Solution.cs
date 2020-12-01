@@ -36,7 +36,24 @@ namespace AdventOfCode.Solutions.Year2020
 
         protected override string SolvePartTwo()
         {
-            return null;
+            var target = 2020;
+            for (int i = 0; i < _inputs.Count - 2; i++)
+            {
+                var set = new HashSet<int>();
+                var currentSum = target - _inputs[i];
+                for (int j = i + 1; j < _inputs.Count; j++)
+                {
+                    if (set.Contains(currentSum - _inputs[j]))
+                    {
+                        var product = _inputs[i] * _inputs[j] * (currentSum - _inputs[j]);
+                        return product.ToString();
+                    }
+
+                    set.Add(_inputs[j]);
+                }
+            }
+
+            return "None found";
         }
     }
 }
