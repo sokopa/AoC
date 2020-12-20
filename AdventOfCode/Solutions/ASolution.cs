@@ -6,7 +6,7 @@ using System.Net.Http;
 namespace AdventOfCode.Solutions
 {
 
-    abstract class ASolution
+    public abstract class ASolution
     {
 
         Lazy<string> _input, _part1, _part2;
