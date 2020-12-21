@@ -43,12 +43,9 @@ namespace AdventOfCode.Solutions.Year2020
 
         protected override string SolvePartOne()
         {
-            _foods.ForEach(Console.WriteLine);
+            //_foods.ForEach(Console.WriteLine);
             var foodsByAllergen = _foods.SelectMany(food => food.Allergens.Select(a => (a, food)))
                 .ToLookup(a => a.a, a => a.food);
-            var ingredientsCount = _foods.SelectMany(food => food.Ingredients.Select(i => (i, food)))
-                .GroupBy(l => l.i)
-                .ToDictionary(g => g.Key, g => g.Count());
             
             // find common ingredients in each food the allergen occurs
             var danger = foodsByAllergen.ToDictionary(g => g.Key, g =>
@@ -63,7 +60,33 @@ namespace AdventOfCode.Solutions.Year2020
 
         protected override string SolvePartTwo()
         {
-            return null;
+            var foodsByAllergen = _foods.SelectMany(food => food.Allergens.Select(a => (a, food)))
+                .ToLookup(a => a.a, a => a.food);
+            var danger = foodsByAllergen.ToDictionary(g => g.Key, g =>
+                g.Aggregate(g.First().Ingredients, (acc, curr) => acc.Intersect(curr.Ingredients).ToList()));
+
+         
+            // Kinda like Day16
+            do
+            {
+                var orderedAllergensByIngCount = danger.OrderBy(a => a.Value.Count);
+                foreach (var pair in orderedAllergensByIngCount)
+                {
+                    if (danger[pair.Key].Count == 1)
+                    {
+                        var removeFromOthers = danger[pair.Key].First();
+                        foreach (var other in danger.Where(a => a.Value.Count > 1))
+                        {
+                            danger[other.Key].Remove(removeFromOthers);
+                        }
+                    }
+                }
+                
+            } while (danger.Any(a => a.Value.Count > 1));
+
+            var answer = string.Join(",", danger.OrderBy(g => g.Key).Select(g => g.Value.First()));
+            Console.WriteLine(answer);
+            return answer;
         }
     }
 }
